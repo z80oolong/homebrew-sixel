@@ -131,7 +131,7 @@ class FfmpegAT612 < Formula
     bin.install (buildpath/"tools").children.select { |f| f.file? && f.executable? }
     pkgshare.install buildpath/"tools/python"
 
-    append_rpath bin/"ffmpeg", "z80oolong/sixel/ffmpeg@6.1.2"
+    append_rpath bin/"ffmpeg", full_name
   end
 
   def append_rpath(binname, *append_list)

@@ -6,7 +6,7 @@ class FfmpegHead < Formula
   head "https://git.ffmpeg.org/ffmpeg.git", branch: "master"
 
   stable do
-    current_commit = "851a84650ef6026871f3b565d1f54c9d7a5397a4"
+    current_commit = "26c5d8cf5d6dcd520e781754d986e9907d74270e"
     url "https://git.ffmpeg.org/ffmpeg.git",
       branch:   "master",
       revision: current_commit
@@ -138,7 +138,7 @@ class FfmpegHead < Formula
     bin.install (buildpath/"tools").children.select { |f| f.file? && f.executable? }
     pkgshare.install buildpath/"tools/python"
 
-    append_rpath bin/"ffmpeg", "z80oolong/sixel/ffmpeg-head"
+    append_rpath bin/"ffmpeg", full_name
   end
 
   def append_rpath(binname, *append_list)
@@ -219,7 +219,7 @@ index f8c23f2870..36d4181370 100644
 +$ ffmpeg -i 'https://www.youtube.com/watch?v=ixaMZPPmVG0' -f sixel -pix_fmt rgb24 -s 480x270 -
 +```
 diff --git a/configure b/configure
-index 3a1e72e1c6..44c8089421 100755
+index 750c99e3b9..b803598593 100755
 --- a/configure
 +++ b/configure
 @@ -271,6 +271,7 @@ External library support:
@@ -238,7 +238,7 @@ index 3a1e72e1c6..44c8089421 100755
      libsmbclient
      libsnappy
      libsoxr
-@@ -3770,6 +3772,7 @@ oss_indev_deps_any="sys_soundcard_h"
+@@ -3777,6 +3779,7 @@ oss_indev_deps_any="sys_soundcard_h"
  oss_outdev_deps_any="sys_soundcard_h"
  pulse_indev_deps="libpulse"
  pulse_outdev_deps="libpulse"
@@ -246,7 +246,7 @@ index 3a1e72e1c6..44c8089421 100755
  sdl2_outdev_deps="sdl2"
  sndio_indev_deps="sndio"
  sndio_outdev_deps="sndio"
-@@ -7021,6 +7024,7 @@ enabled librtmp           && require_pkg_config librtmp librtmp librtmp/rtmp.h R
+@@ -7037,6 +7040,7 @@ enabled librtmp           && require_pkg_config librtmp librtmp librtmp/rtmp.h R
  enabled librubberband     && require_pkg_config librubberband "rubberband >= 1.8.1" rubberband/rubberband-c.h rubberband_new -lstdc++ && append librubberband_extralibs "-lstdc++"
  enabled libshaderc        && require_pkg_config spirv_compiler "shaderc >= 2019.1" shaderc/shaderc.h shaderc_compiler_initialize
  enabled libshine          && require_pkg_config libshine shine shine/layer3.h shine_encode_buffer

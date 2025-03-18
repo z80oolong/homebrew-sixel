@@ -1,8 +1,8 @@
-class FfmpegAT702 < Formula
+class FfmpegAT711 < Formula
   desc "Play, record, convert, and stream audio and video"
   homepage "https://ffmpeg.org/"
-  url "https://ffmpeg.org/releases/ffmpeg-7.0.2.tar.xz"
-  sha256 "8646515b638a3ad303e23af6a3587734447cb8fc0a0c064ecdb8e95c4fd8b389"
+  url "https://ffmpeg.org/releases/ffmpeg-7.1.1.tar.xz"
+  sha256 "733984395e0dbbe5c046abda2dc49a5544e7e0e1e2366bba849222ae9e3a03b1"
   license "GPL-2.0-or-later"
   revision 5
 
@@ -64,6 +64,11 @@ class FfmpegAT702 < Formula
   fails_with gcc: "5"
 
   patch :p1, :DATA
+
+  patch do
+    url "https://git.ffmpeg.org/gitweb/ffmpeg.git/patch/d1ed5c06e3edc5f2b5f3664c80121fa55b0baa95"
+    sha256 "b83ba1efdfec19ac54d1b0395a98d02039fe9d45bec1e6473e57a6288a304884"
+  end
 
   def install
     args = %W[
@@ -131,7 +136,7 @@ class FfmpegAT702 < Formula
     bin.install (buildpath/"tools").children.select { |f| f.file? && f.executable? }
     pkgshare.install buildpath/"tools/python"
 
-    append_rpath bin/"ffmpeg", "z80oolong/sixel/ffmpeg@7.0.2"
+    append_rpath bin/"ffmpeg", full_name
   end
 
   def append_rpath(binname, *append_list)
@@ -212,10 +217,10 @@ index f8c23f28..36d41813 100644
 +$ ffmpeg -i 'https://www.youtube.com/watch?v=ixaMZPPmVG0' -f sixel -pix_fmt rgb24 -s 480x270 -
 +```
 diff --git a/configure b/configure
-index 86425130..c9c34988 100755
+index ffa407d5..b9815963 100755
 --- a/configure
 +++ b/configure
-@@ -268,6 +268,7 @@ External library support:
+@@ -271,6 +271,7 @@ External library support:
    --enable-librtmp         enable RTMP[E] support via librtmp [no]
    --enable-libshaderc      enable GLSL->SPIRV compilation via libshaderc [no]
    --enable-libshine        enable fixed-point MP3 encoding via libshine [no]
@@ -223,7 +228,7 @@ index 86425130..c9c34988 100755
    --enable-libsmbclient    enable Samba protocol via libsmbclient [no]
    --enable-libsnappy       enable Snappy compression, needed for hap encoding [no]
    --enable-libsoxr         enable Include libsoxr resampling [no]
-@@ -1946,6 +1947,7 @@ EXTERNAL_LIBRARY_LIST="
+@@ -1952,6 +1953,7 @@ EXTERNAL_LIBRARY_LIST="
      librtmp
      libshaderc
      libshine
@@ -231,7 +236,7 @@ index 86425130..c9c34988 100755
      libsmbclient
      libsnappy
      libsoxr
-@@ -3697,6 +3699,7 @@ oss_indev_deps_any="sys_soundcard_h"
+@@ -3741,6 +3743,7 @@ oss_indev_deps_any="sys_soundcard_h"
  oss_outdev_deps_any="sys_soundcard_h"
  pulse_indev_deps="libpulse"
  pulse_outdev_deps="libpulse"
@@ -239,7 +244,7 @@ index 86425130..c9c34988 100755
  sdl2_outdev_deps="sdl2"
  sndio_indev_deps="sndio"
  sndio_outdev_deps="sndio"
-@@ -6944,6 +6947,7 @@ enabled librtmp           && require_pkg_config librtmp librtmp librtmp/rtmp.h R
+@@ -6989,6 +6992,7 @@ enabled librtmp           && require_pkg_config librtmp librtmp librtmp/rtmp.h R
  enabled librubberband     && require_pkg_config librubberband "rubberband >= 1.8.1" rubberband/rubberband-c.h rubberband_new -lstdc++ && append librubberband_extralibs "-lstdc++"
  enabled libshaderc        && require_pkg_config spirv_compiler "shaderc >= 2019.1" shaderc/shaderc.h shaderc_compiler_initialize
  enabled libshine          && require_pkg_config libshine shine shine/layer3.h shine_encode_buffer
@@ -248,10 +253,10 @@ index 86425130..c9c34988 100755
                                 require libsmbclient libsmbclient.h smbc_init -lsmbclient; }
  enabled libsnappy         && require libsnappy snappy-c.h snappy_compress -lsnappy -lstdc++
 diff --git a/doc/general_contents.texi b/doc/general_contents.texi
-index f269cbd1..f566992b 100644
+index 5980ac6f..af623e33 100644
 --- a/doc/general_contents.texi
 +++ b/doc/general_contents.texi
-@@ -1496,6 +1496,7 @@ performance on systems without hardware floating point support).
+@@ -1520,6 +1520,7 @@ performance on systems without hardware floating point support).
  @item OSS               @tab X      @tab X
  @item PulseAudio        @tab X      @tab X
  @item SDL               @tab        @tab X
