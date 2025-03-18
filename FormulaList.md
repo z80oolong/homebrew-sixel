@@ -14,6 +14,8 @@
 
 この Formula は、動画と音声を記録・変換・再生するための多機能アプリケーションである [FFmpeg][FMPG] の [github 上の HEAD 版][MPGG] について、[SIXEL][SIXL] を用いた端末エミュレータへの画像の描画に対応した修正を施したものを導入するための Formula です。
 
+なお、本 Formula にて適用される [FFmpeg][FMPG] の差分は、 [saitoha 氏][SAIT] によって作成された [FFmpeg の SIXEL 対応差分][SITF] を大幅に修正し、 [最新の FFmpeg][FMPG] に適用したものです。
+
 通常は、 [SIXEL][SIXL] に対応した [FFmpeg][FMPG] において、 [SIXEL 対応の修正を行った直近の HEAD 版の commit][MPGG] の [FFmpeg][FMPG] が導入されます。
 
 [github 上の HEAD 版の最新の commit の FFmpeg][MPGG] を導入する場合は、オプション ```--HEAD``` を指定して下さい。
@@ -40,6 +42,8 @@
 
 この Formula は、動画と音声を記録・変換・再生するための多機能アプリケーションである [FFmpeg][FMPG] の安定版 [FFmpeg {version}][FMPG] について、[SIXEL][SIXL] を用いた端末エミュレータへの画像の描画に対応した修正を施したものを導入するための Formula です。
 
+なお、本 Formula にて適用される [FFmpeg][FMPG] の差分は、 [saitoha 氏][SAIT] によって作成された [FFmpeg の SIXEL 対応差分][SITF] を大幅に修正し、 [最新の FFmpeg][FMPG] に適用したものです。
+
 なお、この Formula で導入した [FFmpeg][FMPG] の使用法については、前述の ```z80oolong/sixel/ffmpeg-head``` の Formula についての記述を参照して下さい。
 
 **この Formula は、 versioned formula であるため、この Formula によって導入される [FFmpeg][FMPG] は、 keg only で導入されることに留意して下さい。**
@@ -61,6 +65,8 @@
 [BREW]:https://linuxbrew.sh/
 [SIXL]:https://saitoha.github.io/libsixel/
 [FMPG]:https://www.ffmpeg.org/
+[SAIT]:https://github.com/saitoha/
+[SITF]:https://github.com/saitoha/FFmpeg-SIXEL/tree/sixel
 [MPGG]:https://github.com/FFmpeg/FFmpeg
 [W3MB]:https://w3m.sourceforge.net/
 [W3MG]:https://github.com/tats/w3m
