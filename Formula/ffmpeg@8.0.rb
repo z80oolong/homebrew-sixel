@@ -1,19 +1,22 @@
-class FfmpegHead < Formula
+def ENV.append_rpath(*append_list)
+  append_list = (append_list.map do |f_name|
+    Formula[f_name].opt_lib
+  end).join(":")
+
+  if (rpaths = fetch("HOMEBREW_RPATH_PATHS", false))
+    self["HOMEBREW_RPATH_PATHS"] = "#{append_list}:#{rpaths}"
+  end
+end
+
+class FfmpegAT80 < Formula
   desc "Play, record, convert, and stream audio and video"
   homepage "https://ffmpeg.org/"
+  url "https://ffmpeg.org/releases/ffmpeg-8.0.tar.xz"
+  sha256 "b2751fccb6cc4c77708113cd78b561059b6fa904b24162fa0be2d60273d27b8e"
   license "GPL-2.0-or-later"
-  revision 5
-  head "https://git.ffmpeg.org/ffmpeg.git", branch: "master"
+  revision 7
 
-  stable do
-    current_commit = "26c5d8cf5d6dcd520e781754d986e9907d74270e"
-    url "https://git.ffmpeg.org/ffmpeg.git",
-      branch:   "master",
-      revision: current_commit
-    version "git-#{current_commit[0..7]}"
-  end
-
-  keg_only "it conflicts with 'homebrew/core/ffmpeg'"
+  keg_only :versioned_formula
 
   depends_on "pkg-config" => :build
   depends_on "aom"
@@ -40,7 +43,6 @@ class FfmpegHead < Formula
   depends_on "opus"
   depends_on "rav1e"
   depends_on "rubberband"
-  depends_on "sdl2"
   depends_on "snappy"
   depends_on "speex"
   depends_on "srt"
@@ -73,6 +75,8 @@ class FfmpegHead < Formula
   patch :p1, :DATA
 
   def install
+    ENV.append_rpath full_name
+
     args = %W[
       --prefix=#{prefix}
       --enable-shared
@@ -137,17 +141,10 @@ class FfmpegHead < Formula
 
     bin.install (buildpath/"tools").children.select { |f| f.file? && f.executable? }
     pkgshare.install buildpath/"tools/python"
-
-    append_rpath bin/"ffmpeg", full_name
   end
 
-  def append_rpath(binname, *append_list)
-    return if OS.mac?
-
-    rpath = `#{Formula["patchelf"].opt_bin}/patchelf --print-rpath #{binname}`.chomp.split(":")
-    append_list.each { |name| rpath.unshift(Formula[name].opt_lib) }
-
-    system Formula["patchelf"].opt_bin/"patchelf", "--set-rpath", rpath.join(":"), binname
+  def diff_data
+    path.readlines(nil).first.gsub(/^.*\n__END__\n/m, "")
   end
 
   test do
@@ -160,7 +157,7 @@ end
 
 __END__
 diff --git a/README.md b/README.md
-index f8c23f2870..36d4181370 100644
+index f8c23f2..36d4181 100644
 --- a/README.md
 +++ b/README.md
 @@ -25,6 +25,8 @@ such as audio, video, subtitles and related metadata.
@@ -219,7 +216,7 @@ index f8c23f2870..36d4181370 100644
 +$ ffmpeg -i 'https://www.youtube.com/watch?v=ixaMZPPmVG0' -f sixel -pix_fmt rgb24 -s 480x270 -
 +```
 diff --git a/configure b/configure
-index 750c99e3b9..b803598593 100755
+index 732de59..7e89193 100755
 --- a/configure
 +++ b/configure
 @@ -271,6 +271,7 @@ External library support:
@@ -230,7 +227,7 @@ index 750c99e3b9..b803598593 100755
    --enable-libsmbclient    enable Samba protocol via libsmbclient [no]
    --enable-libsnappy       enable Snappy compression, needed for hap encoding [no]
    --enable-libsoxr         enable Include libsoxr resampling [no]
-@@ -1956,6 +1957,7 @@ EXTERNAL_LIBRARY_LIST="
+@@ -1972,6 +1973,7 @@ EXTERNAL_LIBRARY_LIST="
      librtmp
      libshaderc
      libshine
@@ -238,15 +235,15 @@ index 750c99e3b9..b803598593 100755
      libsmbclient
      libsnappy
      libsoxr
-@@ -3777,6 +3779,7 @@ oss_indev_deps_any="sys_soundcard_h"
+@@ -3827,6 +3829,7 @@ oss_indev_deps_any="sys_soundcard_h"
  oss_outdev_deps_any="sys_soundcard_h"
  pulse_indev_deps="libpulse"
  pulse_outdev_deps="libpulse"
 +sixel_outdev_deps="libsixel"
- sdl2_outdev_deps="sdl2"
  sndio_indev_deps="sndio"
  sndio_outdev_deps="sndio"
-@@ -7037,6 +7040,7 @@ enabled librtmp           && require_pkg_config librtmp librtmp librtmp/rtmp.h R
+ v4l2_indev_deps_any="linux_videodev2_h sys_videoio_h"
+@@ -7142,6 +7145,7 @@ enabled librtmp           && require_pkg_config librtmp librtmp librtmp/rtmp.h R
  enabled librubberband     && require_pkg_config librubberband "rubberband >= 1.8.1" rubberband/rubberband-c.h rubberband_new -lstdc++ && append librubberband_extralibs "-lstdc++"
  enabled libshaderc        && require_pkg_config spirv_compiler "shaderc >= 2019.1" shaderc/shaderc.h shaderc_compiler_initialize
  enabled libshine          && require_pkg_config libshine shine shine/layer3.h shine_encode_buffer
@@ -255,10 +252,10 @@ index 750c99e3b9..b803598593 100755
                                 require libsmbclient libsmbclient.h smbc_init -lsmbclient; }
  enabled libsnappy         && require libsnappy snappy-c.h snappy_compress -lsnappy -lstdc++
 diff --git a/doc/general_contents.texi b/doc/general_contents.texi
-index 5faf89815b..436526a21d 100644
+index b9dab58..d01f64e 100644
 --- a/doc/general_contents.texi
 +++ b/doc/general_contents.texi
-@@ -1522,6 +1522,7 @@ performance on systems without hardware floating point support).
+@@ -1527,6 +1527,7 @@ performance on systems without hardware floating point support).
  @item OSS               @tab X      @tab X
  @item PulseAudio        @tab X      @tab X
  @item SDL               @tab        @tab X
@@ -267,11 +264,11 @@ index 5faf89815b..436526a21d 100644
  @item VfW capture       @tab X      @tab
  @item X11 grabbing      @tab X      @tab
 diff --git a/doc/outdevs.texi b/doc/outdevs.texi
-index 9ee857528e..a4ac5279bd 100644
+index 86c78f3..6cec888 100644
 --- a/doc/outdevs.texi
 +++ b/doc/outdevs.texi
-@@ -478,6 +478,75 @@ SDL window, forcing its size to the qcif format:
- ffmpeg -i INPUT -c:v rawvideo -pix_fmt yuv420p -window_size qcif -f sdl "SDL output"
+@@ -367,6 +367,75 @@ Play a file on default device on default server:
+ ffmpeg  -i INPUT -f pulse "stream name"
  @end example
  
 +@section SIXEL
@@ -347,32 +344,32 @@ index 9ee857528e..a4ac5279bd 100644
  
  sndio audio output device.
 diff --git a/libavdevice/Makefile b/libavdevice/Makefile
-index c30449201d..96e4bcec03 100644
+index a226368..6f374ce 100644
 --- a/libavdevice/Makefile
 +++ b/libavdevice/Makefile
-@@ -43,6 +43,7 @@ OBJS-$(CONFIG_PULSE_INDEV)               += pulse_audio_dec.o \
+@@ -40,6 +40,7 @@ OBJS-$(CONFIG_PULSE_INDEV)               += pulse_audio_dec.o \
+                                             pulse_audio_common.o timefilter.o
  OBJS-$(CONFIG_PULSE_OUTDEV)              += pulse_audio_enc.o \
                                              pulse_audio_common.o
- OBJS-$(CONFIG_SDL2_OUTDEV)               += sdl2.o
 +OBJS-$(CONFIG_SIXEL_OUTDEV)              += sixel.o
  OBJS-$(CONFIG_SNDIO_INDEV)               += sndio_dec.o sndio.o
  OBJS-$(CONFIG_SNDIO_OUTDEV)              += sndio_enc.o sndio.o
  OBJS-$(CONFIG_V4L2_INDEV)                += v4l2.o v4l2-common.o timefilter.o
 diff --git a/libavdevice/alldevices.c b/libavdevice/alldevices.c
-index 3f0e6101a5..97cfc2bb25 100644
+index 573595f..446c038 100644
 --- a/libavdevice/alldevices.c
 +++ b/libavdevice/alldevices.c
-@@ -51,6 +51,7 @@ extern const FFOutputFormat ff_oss_muxer;
+@@ -48,6 +48,7 @@ extern const FFInputFormat  ff_oss_demuxer;
+ extern const FFOutputFormat ff_oss_muxer;
  extern const FFInputFormat  ff_pulse_demuxer;
  extern const FFOutputFormat ff_pulse_muxer;
- extern const FFOutputFormat ff_sdl2_muxer;
 +extern const FFOutputFormat ff_sixel_muxer;
  extern const FFInputFormat  ff_sndio_demuxer;
  extern const FFOutputFormat ff_sndio_muxer;
  extern const FFInputFormat  ff_v4l2_demuxer;
 diff --git a/libavdevice/sixel.c b/libavdevice/sixel.c
 new file mode 100644
-index 0000000000..82db4a4986
+index 0000000..82db4a4
 --- /dev/null
 +++ b/libavdevice/sixel.c
 @@ -0,0 +1,477 @@

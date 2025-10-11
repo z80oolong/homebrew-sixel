@@ -1,10 +1,20 @@
-class FfmpegAT711 < Formula
+def ENV.append_rpath(*append_list)
+  apaths = (append_list.map do |f_name|
+    Formula[f_name].opt_lib
+  end).join(":")
+
+  if (rpaths = fetch("HOMEBREW_RPATH_PATHS", false))
+    self["HOMEBREW_RPATH_PATHS"] = "#{apaths}:#{rpaths}"
+  end
+end
+
+class FfmpegAT712 < Formula
   desc "Play, record, convert, and stream audio and video"
   homepage "https://ffmpeg.org/"
-  url "https://ffmpeg.org/releases/ffmpeg-7.1.1.tar.xz"
-  sha256 "733984395e0dbbe5c046abda2dc49a5544e7e0e1e2366bba849222ae9e3a03b1"
+  url "https://ffmpeg.org/releases/ffmpeg-7.1.2.tar.xz"
+  sha256 "089bc60fb59d6aecc5d994ff530fd0dcb3ee39aa55867849a2bbc4e555f9c304"
   license "GPL-2.0-or-later"
-  revision 5
+  revision 7
 
   keg_only :versioned_formula
 
@@ -65,12 +75,14 @@ class FfmpegAT711 < Formula
 
   patch :p1, :DATA
 
-  patch do
-    url "https://git.ffmpeg.org/gitweb/ffmpeg.git/patch/d1ed5c06e3edc5f2b5f3664c80121fa55b0baa95"
-    sha256 "b83ba1efdfec19ac54d1b0395a98d02039fe9d45bec1e6473e57a6288a304884"
-  end
+#  patch do
+#    url "https://git.ffmpeg.org/gitweb/ffmpeg.git/patch/d1ed5c06e3edc5f2b5f3664c80121fa55b0baa95"
+#    sha256 "b83ba1efdfec19ac54d1b0395a98d02039fe9d45bec1e6473e57a6288a304884"
+#  end
 
   def install
+    ENV.append_rpath full_name
+
     args = %W[
       --prefix=#{prefix}
       --enable-shared
@@ -135,17 +147,10 @@ class FfmpegAT711 < Formula
 
     bin.install (buildpath/"tools").children.select { |f| f.file? && f.executable? }
     pkgshare.install buildpath/"tools/python"
-
-    append_rpath bin/"ffmpeg", full_name
   end
 
-  def append_rpath(binname, *append_list)
-    return if OS.mac?
-
-    rpath = `#{Formula["patchelf"].opt_bin}/patchelf --print-rpath #{binname}`.chomp.split(":")
-    append_list.each { |name| rpath.unshift(Formula[name].opt_lib) }
-
-    system Formula["patchelf"].opt_bin/"patchelf", "--set-rpath", rpath.join(":"), binname
+  def diff_data
+    path.readlines(nil).first.gsub(/^.*\n__END__\n/m, "")
   end
 
   test do
@@ -217,7 +222,7 @@ index f8c23f28..36d41813 100644
 +$ ffmpeg -i 'https://www.youtube.com/watch?v=ixaMZPPmVG0' -f sixel -pix_fmt rgb24 -s 480x270 -
 +```
 diff --git a/configure b/configure
-index ffa407d5..b9815963 100755
+index 98b582a5..a42347f7 100755
 --- a/configure
 +++ b/configure
 @@ -271,6 +271,7 @@ External library support:
@@ -228,7 +233,7 @@ index ffa407d5..b9815963 100755
    --enable-libsmbclient    enable Samba protocol via libsmbclient [no]
    --enable-libsnappy       enable Snappy compression, needed for hap encoding [no]
    --enable-libsoxr         enable Include libsoxr resampling [no]
-@@ -1952,6 +1953,7 @@ EXTERNAL_LIBRARY_LIST="
+@@ -1954,6 +1955,7 @@ EXTERNAL_LIBRARY_LIST="
      librtmp
      libshaderc
      libshine
@@ -236,7 +241,7 @@ index ffa407d5..b9815963 100755
      libsmbclient
      libsnappy
      libsoxr
-@@ -3741,6 +3743,7 @@ oss_indev_deps_any="sys_soundcard_h"
+@@ -3745,6 +3747,7 @@ oss_indev_deps_any="sys_soundcard_h"
  oss_outdev_deps_any="sys_soundcard_h"
  pulse_indev_deps="libpulse"
  pulse_outdev_deps="libpulse"
@@ -244,7 +249,7 @@ index ffa407d5..b9815963 100755
  sdl2_outdev_deps="sdl2"
  sndio_indev_deps="sndio"
  sndio_outdev_deps="sndio"
-@@ -6989,6 +6992,7 @@ enabled librtmp           && require_pkg_config librtmp librtmp librtmp/rtmp.h R
+@@ -7010,6 +7013,7 @@ enabled librtmp           && require_pkg_config librtmp librtmp librtmp/rtmp.h R
  enabled librubberband     && require_pkg_config librubberband "rubberband >= 1.8.1" rubberband/rubberband-c.h rubberband_new -lstdc++ && append librubberband_extralibs "-lstdc++"
  enabled libshaderc        && require_pkg_config spirv_compiler "shaderc >= 2019.1" shaderc/shaderc.h shaderc_compiler_initialize
  enabled libshine          && require_pkg_config libshine shine shine/layer3.h shine_encode_buffer
