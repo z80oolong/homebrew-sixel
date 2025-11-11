@@ -24,7 +24,7 @@ class FfmpegCurrent < Formula
   head do
     url "https://git.ffmpeg.org/ffmpeg.git", branch: "master"
 
-    patch :p1, Formula["z80oolong/sixel/ffmpeg@9.9.99-dev"].diff_data
+    patch :p1, Formula["z80oolong/sixel/ffmpeg@9999-dev"].diff_data
   end
 
   keg_only "it conflicts with 'homebrew/core/ffmpeg'"
