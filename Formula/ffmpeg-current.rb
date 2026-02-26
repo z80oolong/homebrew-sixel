@@ -1,13 +1,3 @@
-def ENV.append_rpath(*append_list)
-  append_list = (append_list.map do |f_name|
-    Formula[f_name].opt_lib
-  end).join(":")
-
-  if (rpaths = fetch("HOMEBREW_RPATH_PATHS", false))
-    self["HOMEBREW_RPATH_PATHS"] = "#{append_list}:#{rpaths}"
-  end
-end
-
 class FfmpegCurrent < Formula
   desc "Play, record, convert, and stream audio and video"
   homepage "https://ffmpeg.org/"
@@ -15,21 +5,26 @@ class FfmpegCurrent < Formula
   revision 7
 
   stable do
-    url "https://ffmpeg.org/releases/ffmpeg-8.0.tar.xz"
-    sha256 "b2751fccb6cc4c77708113cd78b561059b6fa904b24162fa0be2d60273d27b8e"
+    url "https://ffmpeg.org/releases/ffmpeg-8.0.1.tar.xz"
+    sha256 "05ee0b03119b45c0bdb4df654b96802e909e0a752f72e4fe3794f487229e5a41"
 
-    patch :p1, Formula["z80oolong/sixel/ffmpeg@8.0"].diff_data
+    patch :p1, Formula["z80oolong/sixel/ffmpeg@8.0.1"].diff_data
+
+    patch do
+      url "https://code.ffmpeg.org/FFmpeg/FFmpeg/pulls/21567.patch"
+      sha256 "96ea7f9458b851288ae4cc78e30741beb2d88350f7411da2576faac5f74126b6"
+    end
   end
 
   head do
-    url "https://git.ffmpeg.org/ffmpeg.git", branch: "master"
+    url "https://github.com/FFmpeg/FFmpeg.git", branch: "master"
 
     patch :p1, Formula["z80oolong/sixel/ffmpeg@9999-dev"].diff_data
   end
 
   keg_only "it conflicts with 'homebrew/core/ffmpeg'"
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "aom"
   depends_on "aribb24"
   depends_on "dav1d"
@@ -159,3 +154,17 @@ class FfmpegCurrent < Formula
     assert_predicate mp4out, :exist?
   end
 end
+
+module EnvExtend
+  def ENV.append_rpath(*append_list)
+    apaths = (append_list.map do |f_name|
+      Formula[f_name].opt_lib
+    end).join(":")
+
+    if (rpaths = fetch("HOMEBREW_RPATH_PATHS", false))
+      self["HOMEBREW_RPATH_PATHS"] = "#{apaths}:#{rpaths}"
+    end
+  end
+end
+
+ENV.extend(EnvExtend)

@@ -79,11 +79,11 @@
 
 <!-- 外部リンク一覧 -->
 
-[BREW]: https://linuxbrew.sh/  
-[SIXL]: https://saitoha.github.io/libsixel/  
-[FMPG]: https://www.ffmpeg.org/  
-[SAIT]: https://github.com/saitoha/  
-[SITF]: https://github.com/saitoha/FFmpeg-SIXEL/tree/sixel  
-[MPGG]: https://github.com/FFmpeg/FFmpeg  
-[W3MB]: https://w3m.sourceforge.net/  
+[BREW]: https://linuxbrew.sh/
+[SIXL]: https://saitoha.github.io/libsixel/
+[FMPG]: https://www.ffmpeg.org/
+[SAIT]: https://github.com/saitoha/
+[SITF]: https://github.com/saitoha/FFmpeg-SIXEL/tree/sixel
+[MPGG]: https://github.com/FFmpeg/FFmpeg
+[W3MB]: https://w3m.sourceforge.net/
 [W3MG]: https://github.com/tats/w3m
