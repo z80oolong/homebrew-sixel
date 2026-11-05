@@ -2,24 +2,42 @@ class FfmpegCurrent < Formula
   desc "Play, record, convert, and stream audio and video"
   homepage "https://ffmpeg.org/"
   license "GPL-2.0-or-later"
-  revision 7
+  revision 8
+
+  CURRENT_VERSION = "9.0.2".freeze
+  CURRENT_COMMIT  = "86444dd36834875f274f57705762c5448379d644".freeze 
 
   stable do
-    url "https://ffmpeg.org/releases/ffmpeg-8.0.1.tar.xz"
-    sha256 "05ee0b03119b45c0bdb4df654b96802e909e0a752f72e4fe3794f487229e5a41"
+    url "https://ffmpeg.org/releases/ffmpeg-#{CURRENT_VERSION}.tar.xz"
+    sha256 "8c3850283eb25fa026482078a04051e0be17347b09ef81a0849bec15a96e002e"
 
-    patch :p1, Formula["z80oolong/sixel/ffmpeg@8.0.1"].diff_data
-
-    patch do
-      url "https://code.ffmpeg.org/FFmpeg/FFmpeg/pulls/21567.patch"
-      sha256 "96ea7f9458b851288ae4cc78e30741beb2d88350f7411da2576faac5f74126b6"
+    if build.without?("libsixel@1.10.5") || build.with?("libsixel")
+      patch :p1 do
+        file "Patches/ffmpeg/ffmpeg-#{CURRENT_VERSION}-libsixel-1.8.7-fix.diff"
+        type :unofficial
+      end
+    else
+      patch :p1 do
+        file "Patches/ffmpeg/ffmpeg-#{CURRENT_VERSION}-libsixel-1.10.5-fix.diff"
+        type :unofficial
+      end
     end
   end
 
   head do
     url "https://github.com/FFmpeg/FFmpeg.git", branch: "master"
 
-    patch :p1, Formula["z80oolong/sixel/ffmpeg@9999-dev"].diff_data
+    if build.without?("libsixel@1.10.5") || build.with?("libsixel")
+      patch :p1 do
+        file "Patches/ffmpeg/ffmpeg-HEAD-#{CURRENT_COMMIT[0..7]}-libsixel-1.8.7-fix.diff"
+        type :unofficial
+      end
+    else
+      patch :p1 do
+        file "Patches/ffmpeg/ffmpeg-HEAD-#{CURRENT_COMMIT[0..7]}-libsixel-1.10.5-fix.diff"
+        type :unofficial
+      end
+    end
   end
 
   keg_only "it conflicts with 'homebrew/core/ffmpeg'"
@@ -79,7 +97,9 @@ class FfmpegCurrent < Formula
   fails_with gcc: "5"
 
   def install
-    ENV.append_rpath full_name
+    if (rpaths = ENV.fetch("HOMEBREW_RPATH_PATHS", false))
+      ENV["HOMEBREW_RPATH_PATHS"] = "#{opt_lib}:#{lib}:#{rpaths}"
+    end
 
     args = %W[
       --prefix=#{prefix}
@@ -154,17 +174,3 @@ class FfmpegCurrent < Formula
     assert_predicate mp4out, :exist?
   end
 end
-
-module EnvExtend
-  def ENV.append_rpath(*append_list)
-    apaths = (append_list.map do |f_name|
-      Formula[f_name].opt_lib
-    end).join(":")
-
-    if (rpaths = fetch("HOMEBREW_RPATH_PATHS", false))
-      self["HOMEBREW_RPATH_PATHS"] = "#{apaths}:#{rpaths}"
-    end
-  end
-end
-
-ENV.extend(EnvExtend)
