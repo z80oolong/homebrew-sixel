@@ -77,6 +77,21 @@
   - **この Formula は versioned formula のため、keg-only でインストールされます。**
   - **この Formula によってインストールされた [w3m][W3MB] を使用するには ```brew link --force z80oolong/sixel/w3m@{version}``` を実行してください。**
 
+### z80oolong/sixel/libsixel@1.10.5
+
+この Formula は、 [SIXEL](https://saitoha.github.io/libsixel/) エンコーダ／デコーダライブラリである [libsixel](https://github.com/libsixel/libsixel) の 1.10.5 をインストールする Formula です。
+
+このバージョンはコミュニティフォークによる最終リリースであり、Meson ベースのビルドシステムを採用しています。また、以下の既知のセキュリティ脆弱性に対するパッチを適用しています。
+
+- CVE-2025-9300
+- CVE-2025-61146
+- CVE-2026-110601
+
+```z80oolong/sixel/ffmpeg``` 系 Formula では、この Formula を推奨依存関係として使用しています。```homebrew/core/libsixel```（現在は主に 1.8.x 系）とは別系統のため、用途に応じて選択できます。
+
+- **注意**:
+  - **この Formula は versioned formula のため、keg-only でインストールされます。**
+
 <!-- 外部リンク一覧 -->
 
 [BREW]: https://linuxbrew.sh/

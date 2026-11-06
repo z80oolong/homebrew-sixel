@@ -56,7 +56,7 @@ class FfmpegCurrent < Formula
   depends_on "libbluray"
   depends_on "libdrm"
   depends_on "librist"
-  depends_on "libsixel"
+  depends_on "libsixel" => :optional
   depends_on "libsoxr"
   depends_on "libvidstab"
   depends_on "libvmaf"
@@ -78,6 +78,7 @@ class FfmpegCurrent < Formula
   depends_on "x265"
   depends_on "xvid"
   depends_on "xz"
+  depends_on "z80oolong/sixel/libsixel@1.10.5" => :recommended
   depends_on "zeromq"
   depends_on "zimg"
 
